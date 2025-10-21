@@ -1,0 +1,35 @@
+# TODO List
+
+## Algorithm Study
+  - [ ] Understand Floyd Warshall
+  - [ ] Review algorithm concept
+  - [ ] Implement basic version
+  - [ ] Practice problems
+  - [ ] Understand Fox's algorithm with min plus algo
+  - [ ] Study theoretical foundation
+  - [ ] Understand min-plus algebra operations
+  - [ ] Implementation practice
+
+## Build System
+  - [ ] What are makefiles
+  - [ ] Learn makefile syntax
+  - [ ] Understand targets and dependencies
+  - [ ] Study common patterns
+  - [ ] Understand logic behind
+  - [ ] Compilation process
+  - [ ] Dependency management
+  - [ ] Build optimization
+
+## Project Implementation
+  - [ ] Work on project
+  - [ ] Define project structure
+  - [ ] Implement core functionality
+  - [ ] Debug and refine
+  - [ ] Do makefile
+  - [ ] Create basic makefile
+  - [ ] Add compilation rules
+  - [ ] Set up clean and rebuild targets
+  - [ ] Make testfile for automated testing
+  - [ ] Design test cases
+  - [ ] Implement test script
+  - [ ] Integrate with makefile
