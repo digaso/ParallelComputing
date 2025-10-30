@@ -9,7 +9,12 @@
 
 int main(int argc, char** argv) {
     int rank, size, n, q;
-    
+    long long start_time, end_time;
+    double elapsed_time;
+
+    // Initialize timers
+    start_time = MPI_Wtime();
+
     // Initialize MPI
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -37,42 +42,42 @@ int main(int argc, char** argv) {
         struct EnvData ed;
         gd.matrixSize = n;
         ed.processors = size;
-        
+
         // Check if Fox's algorithm can be applied
         canRunFox(&gd, &ed, &q);
 
         // Allocate and read the full matrix
         Matrix matrix = NULL;
         allocate_matrix(n, &matrix);
-        
+
         if (read_matrix(f, gd, matrix) != 1) {
             fprintf(stderr, "Error reading matrix data\n");
             MPI_Abort(MPI_COMM_WORLD, 1);
         }
-        
+
         fill_matrix(gd, matrix);
-        
+
         // Build scatter matrix using our divideMatrix function
         Matrix* temp_divided = divideMatrix(matrix, &gd, &ed);
         if (!temp_divided) {
             fprintf(stderr, "Error: Failed to divide matrix\n");
             MPI_Abort(MPI_COMM_WORLD, 1);
         }
-        
+
         // Copy to dividedMatrix in the correct order (like buildScatterMatrix from Trabalho_1)
         int k = 0;
         int per_process_size = n / q;
-        
+
         // Matrix divided into submatrices for each process
         for (int proc = 0; proc < size; proc++) {
             for (int i = 0; i < per_process_size * per_process_size; i++) {
-                dividedMatrix[k++] = temp_divided[proc][i];
+                dividedMatrix[ k++ ] = temp_divided[ proc ][ i ];
             }
         }
-        
+
         // Clean up
         for (int i = 0; i < size; i++) {
-            free_matrix(&temp_divided[i]);
+            free_matrix(&temp_divided[ i ]);
         }
         free(temp_divided);
         free_matrix(&matrix);
@@ -86,7 +91,7 @@ int main(int argc, char** argv) {
     ed.processors = size;
     struct FoxDetails* fox_details = initFoxDetails(q, n, ed);
     struct FoxMPI* fox_mpi = initFoxMPI(*fox_details);
-    
+
     // Setup MPI grid and datatype
     setup_grid(fox_mpi);
 
@@ -130,7 +135,11 @@ int main(int argc, char** argv) {
     free_matrix(&localC);
     free(fox_details);
     free(fox_mpi);
-
+    end_time = MPI_Wtime();
+    elapsed_time = end_time - start_time;
+    if (rank == 0) {
+        printf("Total execution time: %f seconds\n", elapsed_time);
+    }
     MPI_Finalize();
     return 0;
 }
