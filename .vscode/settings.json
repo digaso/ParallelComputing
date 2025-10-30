@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.tsx": "typescriptreact",
+    "fox.h": "c"
+  },
+  "cmake.ignoreCMakeListsMissing": true
+}
