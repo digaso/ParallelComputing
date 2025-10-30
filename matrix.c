@@ -62,7 +62,7 @@ int write_matrix(FILE* matrixText, struct GraphData graph_data, Matrix matrix) {
             }
 
             if (matrix[ pos ] >= MATRIX_ELEMENT_MAX - 2) {
-                fprintf(matrixText, "IM");
+                fprintf(matrixText, "0");  // Output 0 for unreachable paths instead of IM
             }
             else {
                 fprintf(matrixText, "%ld", matrix[ pos ]);
@@ -77,7 +77,7 @@ int write_matrix(FILE* matrixText, struct GraphData graph_data, Matrix matrix) {
 int fill_matrix(struct GraphData graph_data, Matrix matrix) {
     const int matrixSize = graph_data.matrixSize;
 
-    printf("Debug: fill_matrix - matrixSize=%d\n", matrixSize);
+    // Filling matrix with infinity values
     
     if (!matrix) {
         printf("Error: Matrix is NULL in fill_matrix\n");
@@ -98,7 +98,7 @@ int fill_matrix(struct GraphData graph_data, Matrix matrix) {
         }
     }
 
-    printf("Debug: fill_matrix completed successfully\n");
+    // Matrix fill completed
     return 1;
 }
 

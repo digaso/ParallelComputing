@@ -46,5 +46,7 @@ void performFoxAlgorithm(struct FoxMPI* fox_mpi, Matrix localA, Matrix localB, M
 
 void performAllPairsShortestPath(struct FoxMPI* fox_mpi, Matrix localA, Matrix localB, Matrix localC);
 
+int assembleMatrix(int matrixSize, int Q, int processes, Matrix originalMatrix, Matrix destinationMatrix);
+
 
 #endif //PARALELCOMPUTING_FOX_H

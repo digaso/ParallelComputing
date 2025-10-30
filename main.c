@@ -9,12 +9,7 @@
 
 int main(int argc, char** argv) {
     int rank, size, n, q;
-    Matrix global_matrix = NULL;
-    Matrix localA = NULL, localB = NULL, localC = NULL;
     
-    struct GraphData* gd = malloc(sizeof(struct GraphData));
-    struct EnvData* ed = malloc(sizeof(struct EnvData));
-
     // Initialize MPI
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -31,109 +26,125 @@ int main(int argc, char** argv) {
     }
 
     // Broadcast matrix dimension to all processes
-    MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&n, 1, MPI_INT, ROOT, MPI_COMM_WORLD);
 
-    printf("Process %d: Matrix dimension: %d\n", rank, n);
+    // ALL processes allocate dividedMatrix (like Trabalho_1)
+    Matrix dividedMatrix = NULL;
+    allocate_matrix(n, &dividedMatrix);
 
-    // Setup data structures
-    gd->matrixSize = n;
-    ed->processors = size;
-    
-    // Check if Fox's algorithm can be applied
-    canRunFox(gd, ed, &q);
-
-    // Initialize Fox algorithm structures
-    struct FoxDetails* fox_details = initFoxDetails(q, n, *ed);
-    struct FoxMPI* fox_mpi = initFoxMPI(*fox_details);
-    
-    // Setup MPI grid and datatype
-    setup_grid(fox_mpi);
-    
-    int per_process_size = n / q;
-    
-    // Allocate local matrices for each process
-    allocate_matrix(per_process_size, &localA);
-    allocate_matrix(per_process_size, &localB);
-    allocate_matrix(per_process_size, &localC);
-
-    // Root process reads the matrix and distributes it
     if (rank == 0) {
-        // Allocate and read the full matrix
-        allocate_matrix(n, &global_matrix);
+        struct GraphData gd;
+        struct EnvData ed;
+        gd.matrixSize = n;
+        ed.processors = size;
         
-        if (read_matrix(f, *gd, global_matrix) != 1) {
+        // Check if Fox's algorithm can be applied
+        canRunFox(&gd, &ed, &q);
+
+        // Allocate and read the full matrix
+        Matrix matrix = NULL;
+        allocate_matrix(n, &matrix);
+        
+        if (read_matrix(f, gd, matrix) != 1) {
             fprintf(stderr, "Error reading matrix data\n");
             MPI_Abort(MPI_COMM_WORLD, 1);
         }
         
-        printf("Matrix read successfully by root process\n");
-        
         // Prepare matrix for all-pairs shortest path algorithm
-        printf("Debug: About to fill matrix\n");
-        fill_matrix(*gd, global_matrix);
-        printf("Debug: Matrix filled, about to divide\n");
+        // Original matrix read successfully
         
-        // Divide matrix for distribution
-        Matrix* divided_matrices = divideMatrix(global_matrix, gd, ed);
-        if (!divided_matrices) {
+        fill_matrix(gd, matrix);
+        
+        // Matrix filled with infinity values for missing paths
+        
+        // Build scatter matrix using our divideMatrix function
+        Matrix* temp_divided = divideMatrix(matrix, &gd, &ed);
+        if (!temp_divided) {
             fprintf(stderr, "Error: Failed to divide matrix\n");
             MPI_Abort(MPI_COMM_WORLD, 1);
         }
-        printf("Debug: Matrix divided successfully\n");
         
-        // Scatter the divided matrices to all processes
+        // Copy to dividedMatrix in the correct order (like buildScatterMatrix from Trabalho_1)
+        int k = 0;
+        int per_process_size = n / q;
+        
+        // Matrix divided into submatrices for each process
+        
         for (int proc = 0; proc < size; proc++) {
-            if (proc == 0) {
-                // Copy to root's local matrix
-                copy_matrix(per_process_size, localA, divided_matrices[proc]);
-            } else {
-                // Send to other processes (simplified - should use MPI_Scatter)
-                MPI_Send(divided_matrices[proc], per_process_size * per_process_size, 
-                        MATRIX_ELEMENT_MPI, proc, 0, MPI_COMM_WORLD);
+            for (int i = 0; i < per_process_size * per_process_size; i++) {
+                dividedMatrix[k++] = temp_divided[proc][i];
             }
         }
         
-        // Clean up divided matrices
+        // dividedMatrix prepared for scattering
+        
+        // Clean up
         for (int i = 0; i < size; i++) {
-            free_matrix(&divided_matrices[i]);
+            free_matrix(&temp_divided[i]);
         }
-        free(divided_matrices);
-        free_matrix(&global_matrix);
-    } else {
-        // Non-root processes receive their submatrix
-        MPI_Recv(localA, per_process_size * per_process_size, MATRIX_ELEMENT_MPI, 
-                0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        free(temp_divided);
+        free_matrix(&matrix);
     }
+
+    // Broadcast Q to all processes
+    MPI_Bcast(&q, 1, MPI_INT, ROOT, MPI_COMM_WORLD);
+
+    // Setup Fox structures
+    struct EnvData ed;
+    ed.processors = size;
+    struct FoxDetails* fox_details = initFoxDetails(q, n, ed);
+    struct FoxMPI* fox_mpi = initFoxMPI(*fox_details);
     
-    // Copy A to B initially (for all-pairs shortest path)
+    // Setup MPI grid and datatype
+    setup_grid(fox_mpi);
+
+    // Allocate local matrices
+    Matrix localA = NULL, localB = NULL, localC = NULL;
+    int per_process_size = n / q;
+    allocate_matrix(per_process_size, &localA);
+    allocate_matrix(per_process_size, &localB);
+    allocate_matrix(per_process_size, &localC);
+
+    // Scatter (like Trabalho_1)
+    MPI_Scatter(dividedMatrix, 1, fox_mpi->datatype, localA, 1, fox_mpi->datatype, ROOT, fox_mpi->cart);
+
+    // Debug: Print what each process received
+    // Process received its local matrix
+
+    // Copy A to B initially
     copy_matrix(per_process_size, localB, localA);
-    
-    // Initialize result matrix C
-    fill_matrix(*gd, localC);
-    
-    printf("Process %d: Local matrices initialized\n", rank);
-    
+
     // Execute Fox algorithm for all-pairs shortest path
     performAllPairsShortestPath(fox_mpi, localA, localB, localC);
-    
-    printf("Process %d: Fox algorithm completed\n", rank);
 
-    // Clean up MPI structures - let MPI_Finalize handle communicator cleanup
-    if (fox_mpi) {
-        free(fox_mpi);
+    // Debug: Print localC before gathering
+    // Process computed its local result
+
+    // Gather results (like Trabalho_1)
+    MPI_Gather(localC, 1, fox_mpi->datatype, dividedMatrix, 1, fox_mpi->datatype, ROOT, fox_mpi->cart);
+
+    if (fox_mpi->fox_details.myRank == ROOT) {
+        Matrix finalDestination = NULL;
+        allocate_matrix(n, &finalDestination);
+
+        assembleMatrix(n, q, size, dividedMatrix, finalDestination);
+
+        printf("\nFinal shortest path matrix:\n");
+        struct GraphData gd;
+        gd.matrixSize = n;
+        write_matrix(stdout, gd, finalDestination);
+
+        free_matrix(&finalDestination);
     }
-    
-    // Clean up matrices
-    if (localA) free_matrix(&localA);
-    if (localB) free_matrix(&localB);
-    if (localC) free_matrix(&localC);
-    
-    // Clean up other structures
-    if (fox_details) free(fox_details);
-    if (gd) free(gd);
-    if (ed) free(ed);
-    
-    printf("Process %d: Cleanup completed, finalizing MPI\n", rank);
+
+    // Cleanup
+    free_matrix(&dividedMatrix);
+    free_matrix(&localA);
+    free_matrix(&localB);
+    free_matrix(&localC);
+    free(fox_details);
+    free(fox_mpi);
+
     MPI_Finalize();
     return 0;
 }
