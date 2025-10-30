@@ -93,8 +93,6 @@ Matrix* divideMatrix(Matrix matrix, struct GraphData* graphData, struct EnvData*
     int matrixSize = graphData->matrixSize;
     int perProcessSize = matrixSize / Q;
     
-    // Matrix division parameters calculated
-    
     // Allocate array of matrices for each process
     Matrix* processMatrices = malloc(envData->processors * sizeof(Matrix));
     if (!processMatrices) {
@@ -116,8 +114,6 @@ Matrix* divideMatrix(Matrix matrix, struct GraphData* graphData, struct EnvData*
         // Calculate starting position for this process (based on Trabalho_1 approach)
         int startRow = (proc / Q) * perProcessSize;
         int startCol = (proc % Q) * perProcessSize;
-        
-        // Process submatrix boundaries calculated
         
         // Extract submatrix for this process
         int k = 0;
@@ -170,13 +166,11 @@ void performFoxAlgorithm(struct FoxMPI* fox_mpi, Matrix localA, Matrix localB, M
     }
     
     // Fox algorithm starting
-    
     for (int step = 0; step < fox_mpi->fox_details.Q; step++) {
         // Calculate the root for broadcasting in this step
         int bcast_root = (fox_mpi->fox_details.myRow + step) % fox_mpi->fox_details.Q;
         
         // Broadcasting step
-        
         if (bcast_root == fox_mpi->fox_details.myColumn) {
             // Broadcasting local A matrix
             // Broadcast our localA matrix to processes in our row
@@ -187,7 +181,6 @@ void performFoxAlgorithm(struct FoxMPI* fox_mpi, Matrix localA, Matrix localB, M
             gd.matrixSize = per_process_size;
             multiply_matrix(gd, localA, localB, localC);
         } else {
-            // Receiving broadcast from other process
             // Receive broadcast from the appropriate process in our row
             MPI_Bcast(tempA, 1, fox_mpi->datatype, bcast_root, fox_mpi->row);
             
@@ -197,14 +190,11 @@ void performFoxAlgorithm(struct FoxMPI* fox_mpi, Matrix localA, Matrix localB, M
             multiply_matrix(gd, tempA, localB, localC);
         }
         
-        // Matrix multiplication completed for this step
-        
         // Circular shift of B matrices upward in the column
         int source = (fox_mpi->fox_details.myRow + 1) % fox_mpi->fox_details.Q;
         int dest = (fox_mpi->fox_details.myRow + fox_mpi->fox_details.Q - 1) % fox_mpi->fox_details.Q;
         
         // Shifting B matrices
-        
         MPI_Status status;
         MPI_Sendrecv_replace(localB, 1, fox_mpi->datatype, dest, 37, source, 37, 
                             fox_mpi->col, &status);
