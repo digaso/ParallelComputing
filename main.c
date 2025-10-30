@@ -50,12 +50,7 @@ int main(int argc, char** argv) {
             MPI_Abort(MPI_COMM_WORLD, 1);
         }
         
-        // Prepare matrix for all-pairs shortest path algorithm
-        // Original matrix read successfully
-        
         fill_matrix(gd, matrix);
-        
-        // Matrix filled with infinity values for missing paths
         
         // Build scatter matrix using our divideMatrix function
         Matrix* temp_divided = divideMatrix(matrix, &gd, &ed);
@@ -69,14 +64,11 @@ int main(int argc, char** argv) {
         int per_process_size = n / q;
         
         // Matrix divided into submatrices for each process
-        
         for (int proc = 0; proc < size; proc++) {
             for (int i = 0; i < per_process_size * per_process_size; i++) {
                 dividedMatrix[k++] = temp_divided[proc][i];
             }
         }
-        
-        // dividedMatrix prepared for scattering
         
         // Clean up
         for (int i = 0; i < size; i++) {
@@ -108,17 +100,11 @@ int main(int argc, char** argv) {
     // Scatter (like Trabalho_1)
     MPI_Scatter(dividedMatrix, 1, fox_mpi->datatype, localA, 1, fox_mpi->datatype, ROOT, fox_mpi->cart);
 
-    // Debug: Print what each process received
-    // Process received its local matrix
-
     // Copy A to B initially
     copy_matrix(per_process_size, localB, localA);
 
     // Execute Fox algorithm for all-pairs shortest path
     performAllPairsShortestPath(fox_mpi, localA, localB, localC);
-
-    // Debug: Print localC before gathering
-    // Process computed its local result
 
     // Gather results (like Trabalho_1)
     MPI_Gather(localC, 1, fox_mpi->datatype, dividedMatrix, 1, fox_mpi->datatype, ROOT, fox_mpi->cart);
