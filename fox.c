@@ -95,9 +95,26 @@ Matrix* divideMatrix(Matrix matrix, struct EnvData* envData) {
 
 }
 
-void canRunFox(struct GraphData* graphData, struct EnvData* envData) {
-    if (sqrt(envData->processors) != (float)sqrtl(envData->processors)) {
-        printf("Number of processors must be a perfect square.\n");
-        exit(EXIT_FAILURE);
+void canRunFox(struct GraphData* graphData, struct EnvData* envData, int* q) {
+    int maxQ = (int)(sqrt(envData->processors));
+    int possibleProCount = maxQ * maxQ;
+    int matrixSize = graphData->matrixSize;
+
+    if (possibleProCount != envData->processors) {
+
+        //The number of processes is not a perfect square.
+
+        return 0;
     }
+
+    if (matrixSize % maxQ == 0) {
+
+        *q = maxQ;
+
+        return 1;
+    }
+
+    return 0;
+
 }
+

@@ -5,7 +5,6 @@
 #include "math.h"
 #include "fox.h"
 
-
 #define ROOT 0
 
 int main(int argc, char** argv) {
@@ -17,6 +16,7 @@ int main(int argc, char** argv) {
     struct GraphData* gd = malloc(sizeof(struct GraphData));
 
     struct EnvData* ed = malloc(sizeof(struct EnvData));
+
 
     // Initialize MPI
     MPI_Init(&argc, &argv);
@@ -32,8 +32,9 @@ int main(int argc, char** argv) {
             MPI_Abort(MPI_COMM_WORLD, 1);
         }
     }
-    MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
+
+    printf("cona");
 
     // Broadcast matrix dimension to all processes
     MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -41,7 +42,7 @@ int main(int argc, char** argv) {
     // Check if Fox's algorithm can be applied
     gd->matrixSize = n;
     ed->processors = size;
-    canRunFox(gd, ed);
+    canRunFox(gd, ed, &q);
 
 
     return 0;

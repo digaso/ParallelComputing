@@ -30,7 +30,7 @@ inline int calculateProjection(const int size, const int row, const int column) 
     return row * size + column;
 }
 
-void canRunFox(struct GraphData* graphData, struct EnvData* envData);
+void canRunFox(struct GraphData* graphData, struct EnvData* envData, int* q);
 
 Matrix* divideMatrix(Matrix matrix, struct EnvData* envData);
 
