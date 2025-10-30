@@ -9,16 +9,17 @@
 
 int main(int argc, char** argv) {
     int rank, size, n, q;
-    long long start_time, end_time;
+    double start_time, end_time;
     double elapsed_time;
 
     // Initialize timers
 
     // Initialize MPI
     MPI_Init(&argc, &argv);
-    start_time = MPI_Wtime();
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    start_time = MPI_Wtime();
 
     FILE* f = stdin;
 
