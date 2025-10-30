@@ -7,13 +7,6 @@
 #include "matrix.h"
 #include "mpi/mpi.h"
 
-struct FoxMPI {
-    struct FoxDetails fox_details;
-
-    MPI_Comm cart, row, col;
-
-    MPI_Datatype datatype;
-};
 
 struct FoxDetails* initFoxDetails(const int Q, const int N, struct EnvData env_data) {
     struct FoxDetails* foxDetails = malloc(sizeof(struct FoxDetails));
@@ -29,6 +22,12 @@ struct FoxMPI* initFoxMPI(struct FoxDetails fox_details) {
     struct FoxMPI* fox_mpi = malloc(sizeof(struct FoxMPI));
 
     fox_mpi->fox_details = fox_details;
+    
+    // Initialize MPI objects to safe values
+    fox_mpi->cart = MPI_COMM_NULL;
+    fox_mpi->row = MPI_COMM_NULL;
+    fox_mpi->col = MPI_COMM_NULL;
+    fox_mpi->datatype = MPI_DATATYPE_NULL;
 
     return fox_mpi;
 }
@@ -90,9 +89,56 @@ int setup_grid(struct FoxMPI* fox_mpi) {
 }
 
 
-Matrix* divideMatrix(Matrix matrix, struct EnvData* envData) {
-
-
+Matrix* divideMatrix(Matrix matrix, struct GraphData* graphData, struct EnvData* envData) {
+    int Q = (int)sqrt(envData->processors);
+    int matrixSize = graphData->matrixSize;
+    int perProcessSize = matrixSize / Q;
+    
+    printf("Debug: divideMatrix - Q=%d, matrixSize=%d, perProcessSize=%d, processors=%d\n", 
+           Q, matrixSize, perProcessSize, envData->processors);
+    
+    // Allocate array of matrices for each process
+    Matrix* processMatrices = malloc(envData->processors * sizeof(Matrix));
+    if (!processMatrices) {
+        printf("Error: Failed to allocate processMatrices\n");
+        return NULL;
+    }
+    
+    // Initialize all pointers to NULL
+    for (int proc = 0; proc < envData->processors; proc++) {
+        processMatrices[proc] = NULL;
+    }
+    
+    for (int proc = 0; proc < envData->processors; proc++) {
+        if (allocate_matrix(perProcessSize, &processMatrices[proc]) != 1) {
+            printf("Error: Failed to allocate matrix for process %d\n", proc);
+            return NULL;
+        }
+        
+        // Calculate starting position for this process (based on Trabalho_1 approach)
+        int startRow = (proc / Q) * perProcessSize;
+        int startCol = (proc % Q) * perProcessSize;
+        
+        printf("Debug: Process %d - startRow=%d, startCol=%d\n", proc, startRow, startCol);
+        
+        // Extract submatrix for this process
+        int k = 0;
+        for (int i = 0; i < perProcessSize; i++) {
+            for (int j = 0; j < perProcessSize; j++) {
+                int globalRow = startRow + i;
+                int globalCol = startCol + j;
+                if (globalRow >= matrixSize || globalCol >= matrixSize) {
+                    printf("Error: Index out of bounds - globalRow=%d, globalCol=%d, matrixSize=%d\n", 
+                           globalRow, globalCol, matrixSize);
+                    return NULL;
+                }
+                processMatrices[proc][k] = matrix[globalRow * matrixSize + globalCol];
+                k++;
+            }
+        }
+    }
+    
+    return processMatrices;
 }
 
 void canRunFox(struct GraphData* graphData, struct EnvData* envData, int* q) {
@@ -116,5 +162,70 @@ void canRunFox(struct GraphData* graphData, struct EnvData* envData, int* q) {
 
     printf("Debug: Fox algorithm can run, q=%d\n", maxQ);
     *q = maxQ;
+}
+
+void performFoxAlgorithm(struct FoxMPI* fox_mpi, Matrix localA, Matrix localB, Matrix localC) {
+    int per_process_size = fox_mpi->fox_details.N / fox_mpi->fox_details.Q;
+    Matrix tempA = NULL;
+    allocate_matrix(per_process_size, &tempA);
+    
+    // Fill tempA with appropriate values
+    for (int i = 0; i < per_process_size * per_process_size; i++) {
+        tempA[i] = 0;
+    }
+    
+    for (int step = 0; step < fox_mpi->fox_details.Q; step++) {
+        // Calculate the root for broadcasting in this step
+        int bcast_root = (fox_mpi->fox_details.myRow + step) % fox_mpi->fox_details.Q;
+        
+        if (bcast_root == fox_mpi->fox_details.myColumn) {
+            // Broadcast our localA matrix to processes in our row
+            MPI_Bcast(localA, 1, fox_mpi->datatype, bcast_root, fox_mpi->row);
+            
+            // Perform matrix multiplication with our own matrices
+            struct GraphData gd;
+            gd.matrixSize = per_process_size;
+            multiply_matrix(gd, localA, localB, localC);
+        } else {
+            // Receive broadcast from the appropriate process in our row
+            MPI_Bcast(tempA, 1, fox_mpi->datatype, bcast_root, fox_mpi->row);
+            
+            // Perform matrix multiplication with received matrix
+            struct GraphData gd;
+            gd.matrixSize = per_process_size;
+            multiply_matrix(gd, tempA, localB, localC);
+        }
+        
+        // Circular shift of B matrices upward in the column
+        int source = (fox_mpi->fox_details.myRow + 1) % fox_mpi->fox_details.Q;
+        int dest = (fox_mpi->fox_details.myRow + fox_mpi->fox_details.Q - 1) % fox_mpi->fox_details.Q;
+        
+        MPI_Status status;
+        MPI_Sendrecv_replace(localB, 1, fox_mpi->datatype, dest, 37, source, 37, 
+                            fox_mpi->col, &status);
+    }
+    
+    free_matrix(&tempA);
+}
+
+void performAllPairsShortestPath(struct FoxMPI* fox_mpi, Matrix localA, Matrix localB, Matrix localC) {
+    int per_process_size = fox_mpi->fox_details.N / fox_mpi->fox_details.Q;
+    int m = 1;
+    
+    // Initialize C matrix for shortest path
+    struct GraphData gd;
+    gd.matrixSize = per_process_size;
+    fill_matrix(gd, localC);
+    
+    while (m < fox_mpi->fox_details.N - 1) {
+        // Perform one iteration of Fox algorithm
+        performFoxAlgorithm(fox_mpi, localA, localB, localC);
+        
+        // Copy result back to A and B for next iteration
+        copy_matrix(per_process_size, localA, localC);
+        copy_matrix(per_process_size, localB, localC);
+        
+        m *= 2;
+    }
 }
 

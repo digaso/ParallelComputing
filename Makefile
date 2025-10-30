@@ -29,7 +29,7 @@ clean:
 	rm -f $(OBJ) $(TARGET)
 
 run: $(TARGET)
-	mpirun -np 5 ./$(TARGET) < matrix_examples/input6
+	mpirun -np 4 ./$(TARGET) < matrix_examples/input6
 
 # Evitar conflitos com ficheiros reais
 .PHONY: all clean

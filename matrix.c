@@ -75,17 +75,30 @@ int write_matrix(FILE* matrixText, struct GraphData graph_data, Matrix matrix) {
 }
 
 int fill_matrix(struct GraphData graph_data, Matrix matrix) {
-
     const int matrixSize = graph_data.matrixSize;
+
+    printf("Debug: fill_matrix - matrixSize=%d\n", matrixSize);
+    
+    if (!matrix) {
+        printf("Error: Matrix is NULL in fill_matrix\n");
+        return 0;
+    }
 
     for (int i = 0; i < matrixSize; i++) {
         for (int j = 0; j < matrixSize; j++) {
-            if (i != j && matrix[ calculateProjection(matrixSize, i, j) ] == 0) {
-                matrix[ calculateProjection(matrixSize, i, j) ] = MATRIX_ELEMENT_MAX - 1;
+            int index = calculateProjection(matrixSize, i, j);
+            if (index < 0 || index >= matrixSize * matrixSize) {
+                printf("Error: Index out of bounds in fill_matrix - index=%d, max=%d\n", 
+                       index, matrixSize * matrixSize);
+                return 0;
+            }
+            if (i != j && matrix[index] == 0) {
+                matrix[index] = MATRIX_ELEMENT_MAX - 1;
             }
         }
     }
 
+    printf("Debug: fill_matrix completed successfully\n");
     return 1;
 }
 
@@ -109,6 +122,8 @@ int multiply_matrix(const struct GraphData graph_data, Matrix matrix_1, Matrix m
             }
         }
     }
+    
+    return 1;
 }
 
 int repeated_squaring_algorithm(const struct GraphData graph_data, Matrix weight_matrix, Matrix result_matrix) {
