@@ -73,19 +73,19 @@ test-p1: $(TARGET)
 test-p4: $(TARGET)  
 	@echo "🔹 Testing P=4 (2×2 grid) across compatible matrices..."
 	@echo "input6 (np=4): 3×3 per process"
-	@cat matrix_examples/input6 | mpirun --oversubscribe -np 4 ./$(TARGET) | grep -A 6 "Final shortest path matrix:" | tail -6 > test_6_p4.tmp && \
+	@cat matrix_examples/input6 | mpirun -x DISPLAY=:0 --oversubscribe -np 4 ./$(TARGET) | grep -A 6 "Final shortest path matrix:" | tail -6 > test_6_p4.tmp && \
 	if diff -q test_6_p4.tmp matrix_examples/output6 >/dev/null; then echo " input6 (P=4): PASSED"; rm test_6_p4.tmp; else echo " input6 (P=4): FAILED"; rm test_6_p4.tmp; fi
 	@echo "input300 (np=4): 150×150 per process"
-	@cat matrix_examples/input300 | mpirun --oversubscribe -np 4 ./$(TARGET) | grep -A 300 "Final shortest path matrix:" | tail -300 > test_300_p4.tmp && \
+	@cat matrix_examples/input300 | mpirun -x DISPLAY=:0 --oversubscribe -np 4 ./$(TARGET) | grep -A 300 "Final shortest path matrix:" | tail -300 > test_300_p4.tmp && \
 	if diff -q test_300_p4.tmp matrix_examples/output300 >/dev/null; then echo " input300 (P=4): PASSED"; rm test_300_p4.tmp; else echo " input300 (P=4): FAILED"; rm test_300_p4.tmp; fi
 	@echo "input600 (np=4): 300×300 per process"
-	@cat matrix_examples/input600 | mpirun --oversubscribe -np 4 ./$(TARGET) | grep -A 600 "Final shortest path matrix:" | tail -600 > test_600_p4.tmp && \
+	@cat matrix_examples/input600 | mpirun -x DISPLAY=:0 --oversubscribe -np 4 ./$(TARGET) | grep -A 600 "Final shortest path matrix:" | tail -600 > test_600_p4.tmp && \
 	if diff -q test_600_p4.tmp matrix_examples/output600 >/dev/null; then echo " input600 (P=4): PASSED"; rm test_600_p4.tmp; else echo " input600 (P=4): FAILED"; rm test_600_p4.tmp; fi
 	@echo "input900 (np=4): 450×450 per process"
-	@cat matrix_examples/input900 | mpirun --oversubscribe -np 4 ./$(TARGET) | grep -A 900 "Final shortest path matrix:" | tail -900 > test_900_p4.tmp && \
+	@cat matrix_examples/input900 | mpirun -x DISPLAY=:0 --oversubscribe -np 4 ./$(TARGET) | grep -A 900 "Final shortest path matrix:" | tail -900 > test_900_p4.tmp && \
 	if diff -q test_900_p4.tmp matrix_examples/output900 >/dev/null; then echo " input900 (P=4): PASSED"; rm test_900_p4.tmp; else echo " input900 (P=4): FAILED"; rm test_900_p4.tmp; fi
 	@echo "input1200 (np=4): 600×600 per process"
-	@cat matrix_examples/input1200 | mpirun --oversubscribe -np 4 ./$(TARGET) | grep -A 1200 "Final shortest path matrix:" | tail -1200 > test_1200_p4.tmp && \
+	@cat matrix_examples/input1200 | mpirun -x DISPLAY=:0 --oversubscribe -np 4 ./$(TARGET) | grep -A 1200 "Final shortest path matrix:" | tail -1200 > test_1200_p4.tmp && \
 	if diff -q test_1200_p4.tmp matrix_examples/output1200 >/dev/null; then echo " input1200 (P=4): PASSED"; rm test_1200_p4.tmp; else echo " input1200 (P=4): FAILED"; rm test_1200_p4.tmp; fi
 
 test-p9: $(TARGET)
