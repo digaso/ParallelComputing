@@ -1,0 +1,5 @@
+#quad core machines
+l101.alunos.dcc.fc.up.pt slots=4 max-slots=4
+l102.alunos.dcc.fc.up.pt slots=4 max-slots=4
+l103.alunos.dcc.fc.up.pt slots=4 max-slots=4
+l104.alunos.dcc.fc.up.pt slots=4 max-slots=4
