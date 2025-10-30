@@ -34,16 +34,19 @@ int main(int argc, char** argv) {
     }
 
 
-    printf("cona");
-
     // Broadcast matrix dimension to all processes
     MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+    printf("Process %d: Matrix dimension: %d\n", rank, n);
 
     // Check if Fox's algorithm can be applied
     gd->matrixSize = n;
     ed->processors = size;
     canRunFox(gd, ed, &q);
 
-
+    // Clean up and finalize MPI
+    free(gd);
+    free(ed);
+    MPI_Finalize();
     return 0;
 }

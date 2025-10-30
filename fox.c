@@ -37,8 +37,8 @@ int setup_mpi_datatype(MPI_Datatype* datatype, const struct FoxDetails* fox_deta
     //The size of the matrix per process
     const int perProcessMatrixSize = fox_details->N / fox_details->Q;
 
-    MPI_Type_vector(perProcessMatrixSize, perProcessMatrixSize, perProcessMatrixSize,
-        MATRIX_ELEMENT_MPI, datatype);
+    MPI_Type_vector(perProcessMatrixSize, perProcessMatrixSize, fox_details->N,
+      MATRIX_ELEMENT_MPI, datatype);
 
     //Let MPI know about the new datatype
     MPI_Type_commit(datatype);
@@ -100,21 +100,21 @@ void canRunFox(struct GraphData* graphData, struct EnvData* envData, int* q) {
     int possibleProCount = maxQ * maxQ;
     int matrixSize = graphData->matrixSize;
 
+    printf("Debug: processors=%d, maxQ=%d, possibleProCount=%d, matrixSize=%d\n", 
+           envData->processors, maxQ, possibleProCount, matrixSize);
+
     if (possibleProCount != envData->processors) {
-
         //The number of processes is not a perfect square.
-
-        return 0;
+        fprintf(stderr, "Error: Number of processes (%d) is not a perfect square\n", envData->processors);
+        MPI_Abort(MPI_COMM_WORLD, 1);
     }
 
-    if (matrixSize % maxQ == 0) {
-
-        *q = maxQ;
-
-        return 1;
+    if (matrixSize % maxQ != 0) {
+        fprintf(stderr, "Error: Matrix size (%d) is not divisible by sqrt(processes) (%d)\n", matrixSize, maxQ);
+        MPI_Abort(MPI_COMM_WORLD, 1);
     }
 
-    return 0;
-
+    printf("Debug: Fox algorithm can run, q=%d\n", maxQ);
+    *q = maxQ;
 }
 
