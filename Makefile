@@ -7,7 +7,7 @@ CFLAGS = -Wall -Wextra -O2 -Iinclude
 
 
 # Source and object files
-SRC = main.c io.c fox.c matrix.c 
+SRC = main.c fox.c matrix.c 
 OBJ = $(SRC:.c=.o)
 
 # Executable name
