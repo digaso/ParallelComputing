@@ -52,17 +52,7 @@ test-multi: $(TARGET)
 
 test-timed: $(TARGET)
 	@echo "=== Performance Benchmarking ==="
-	@echo "Running timing tests for all process configurations..."
-	@echo ""
-	@rm -f timing_results.txt
-	@$(MAKE) run-timed-tests
-	@echo ""
-	@echo "📊 Performance Results Summary:"
-	@echo "================================"
-	@printf "%-12s %-10s %s\n" "Processes" "Matrix" "Time (seconds)"
-	@echo "------------------------------------"
-	@cat timing_results.txt 2>/dev/null || echo "No timing data collected"
-	@rm -f timing_results.txt
+	@./timing_script.sh
 
 run-timed-tests: $(TARGET)
 	@$(MAKE) timed-p1 timed-p4 timed-p9 timed-p16 timed-p25
@@ -247,15 +237,15 @@ clean-tests:
 
 timed-p1: $(TARGET)
 	@echo "🔹 Timing P=1 tests..."
-	@echo "P=1 input6:" && { time cat matrix_examples/input6 | mpirun --oversubscribe -np 1 ./$(TARGET) >/dev/null ; } 2>&1 | grep elapsed | awk '{print "P=1          input6     " $$3}' | sed 's/elapsed//' >> timing_results.txt
-	@echo "P=1 input300:" && { time cat matrix_examples/input300 | mpirun --oversubscribe -np 1 ./$(TARGET) >/dev/null ; } 2>&1 | grep elapsed | awk '{print "P=1          input300   " $$3}' | sed 's/elapsed//' >> timing_results.txt
-	@echo "P=1 input600:" && { time cat matrix_examples/input600 | mpirun --oversubscribe -np 1 ./$(TARGET) >/dev/null ; } 2>&1 | grep elapsed | awk '{print "P=1          input600   " $$3}' | sed 's/elapsed//' >> timing_results.txt
-	@echo "P=1 input900:" && { time cat matrix_examples/input900 | mpirun --oversubscribe -np 1 ./$(TARGET) >/dev/null ; } 2>&1 | grep elapsed | awk '{print "P=1          input900   " $$3}' | sed 's/elapsed//' >> timing_results.txt
-	@echo "P=1 input1200:" && { time cat matrix_examples/input1200 | mpirun --oversubscribe -np 1 ./$(TARGET) >/dev/null ; } 2>&1 | grep elapsed | awk '{print "P=1          input1200  " $$3}' | sed 's/elapsed//' >> timing_results.txt
+	@printf "P=1          input6     " >> timing_results.txt && { time cat matrix_examples/input6 | mpirun --oversubscribe -np 1 ./$(TARGET) >/dev/null ; } 2>&1 | grep real | awk '{print $$2}' >> timing_results.txt
+	@printf "P=1          input300   " >> timing_results.txt && { time cat matrix_examples/input300 | mpirun --oversubscribe -np 1 ./$(TARGET) >/dev/null ; } 2>&1 | grep real | awk '{print $$2}' >> timing_results.txt
+	@printf "P=1          input600   " >> timing_results.txt && { time cat matrix_examples/input600 | mpirun --oversubscribe -np 1 ./$(TARGET) >/dev/null ; } 2>&1 | grep real | awk '{print $$2}' >> timing_results.txt
+	@printf "P=1          input900   " >> timing_results.txt && { time cat matrix_examples/input900 | mpirun --oversubscribe -np 1 ./$(TARGET) >/dev/null ; } 2>&1 | grep real | awk '{print $$2}' >> timing_results.txt
+	@printf "P=1          input1200  " >> timing_results.txt && { time cat matrix_examples/input1200 | mpirun --oversubscribe -np 1 ./$(TARGET) >/dev/null ; } 2>&1 | grep real | awk '{print $$2}' >> timing_results.txt
 
 timed-p4: $(TARGET)
 	@echo "🔹 Timing P=4 tests..."
-	@echo "P=4 input6:" && { time cat matrix_examples/input6 | mpirun --oversubscribe -np 4 ./$(TARGET) >/dev/null ; } 2>&1 | grep elapsed | awk '{print "P=4          input6     " $$3}' | sed 's/elapsed//' >> timing_results.txt
+	@echo "P=4 input6:" && { time cat matrix_examples/input6 | mpirun --oversubscribe -np 4 ./$(TARGET) >/dev/null ; } 2>&1 | printf "P=4          input6     " >> timing_results.txt && { time cat matrix_examples/input6 | mpirun --oversubscribe -np 4 ./$(TARGET) >/dev/null ; } 2>&1 | grep real | awk '{print $$2}' >> timing_results.txt
 	@echo "P=4 input300:" && { time cat matrix_examples/input300 | mpirun --oversubscribe -np 4 ./$(TARGET) >/dev/null ; } 2>&1 | grep elapsed | awk '{print "P=4          input300   " $$3}' | sed 's/elapsed//' >> timing_results.txt
 	@echo "P=4 input600:" && { time cat matrix_examples/input600 | mpirun --oversubscribe -np 4 ./$(TARGET) >/dev/null ; } 2>&1 | grep elapsed | awk '{print "P=4          input600   " $$3}' | sed 's/elapsed//' >> timing_results.txt
 	@echo "P=4 input900:" && { time cat matrix_examples/input900 | mpirun --oversubscribe -np 4 ./$(TARGET) >/dev/null ; } 2>&1 | grep elapsed | awk '{print "P=4          input900   " $$3}' | sed 's/elapsed//' >> timing_results.txt
