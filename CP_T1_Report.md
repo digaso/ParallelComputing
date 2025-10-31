@@ -1,26 +1,63 @@
-# CP_T1 - Parallel Computing Assignment Report
+Project done by: **Diogo Alves**, 202006033 and **Mário Minhava**, 202206190
+
 
 ## Project Overview
 
 This project implements a parallel solution for **All-Pairs Shortest Path computation** using the **Fox Algorithm for matrix multiplication**. The implementation leverages the **MPI (Message Passing Interface)** library to distribute computation across multiple processes in a 2D process grid topology.
 
-## Algorithm Description
+## Algorithm Implementation
 
-### Floyd-Warshall Algorithm
+### All-Pairs Shortest Path Problem
 
-The Floyd-Warshall algorithm computes the shortest paths between all pairs of vertices in a weighted graph. It uses dynamic programming with the recurrence relation:
+The algorithm implemented solves the All-Pairs Shortest Path problem, which consists of finding the shortest path from each vertex to every other vertex in a directed graph. The solution approach involves:
 
-```
-dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])
-```
+1. **Graph Representation**: The graph is represented as an N×N matrix (where N is the number of vertices)
+   - Each position (row, column) represents the cost of traveling directly from vertex `row` to vertex `column`
+   - If no direct path exists between two nodes, the position is set to $\infty$
+   - The solution is an N×N matrix where each position (row, column) corresponds to the cost of the shortest path between vertices `row` and `column`
 
-### Fox Algorithm Integration
+### Distance Product Matrix Multiplication
 
-Instead of implementing Floyd-Warshall directly, we use the **repeated squaring approach** where:
+This algorithm adapts normal matrix multiplication for shortest path computation by:
+- **Replacing multiplication with addition**: Instead of `a[i][k] * b[k][j]`, we use `a[i][k] + b[k][j]`
+- **Replacing addition with minimum**: Instead of summing products, we take the minimum of all sums
 
-- The adjacency matrix is repeatedly multiplied by itself
-- Each multiplication represents one more step in the shortest path computation
-- The Fox algorithm parallelizes these matrix multiplications efficiently
+Given matrices `D^f` and `D^k` (where f and k represent the maximum path depth), the algorithm produces `D^(f+k)`, combining paths from both input matrices. Path depth refers to the number of intermediate nodes traversed from origin to destination.
+
+To solve the All-Pairs Shortest Path problem, we need matrix `D^N` that considers all possible paths. Since paths longer than N cannot be shorter than existing paths, `D^N` contains the optimal solution.
+
+**Naive Approach**: Multiply `D^1` by itself N times
+- **Complexity**: O(N^4) - N matrix multiplications, each O(N^3)
+
+### Repeated Squaring Optimization
+
+We exploit the mathematical property that `D^f * D^k = D^(f+k)` to reduce complexity:
+
+1. Start with weight matrix `D^1`
+2. Repeatedly square: `D^k * D^k = D^(2k)`
+3. Continue until `2^k >= N`
+
+**Optimized Complexity**: O($\sqrt{N}$) * O(N^3) = O(N^3.5), significantly better than O(N^4)
+
+### Fox's Algorithm Parallelization
+
+Fox's algorithm parallelizes matrix multiplication across multiple processors:
+
+**Requirements**:
+- Number of processes `p = q^2` (perfect square)
+- `q` must divide `N` evenly
+- Each process handles an `(N/q) × (N/q)` submatrix
+
+**Process Organization**:
+- Processes arranged in a `q × q` 2D grid
+- Matrix divided into blocks distributed in checkerboard fashion
+- Process assignment: `f(p) = (p / q, p mod q)`
+
+**Algorithm Steps** (for q iterations):
+1. **Matrix Selection**: In each row, select submatrix `A[r,u]` where `u = (r + step) mod q`
+2. **Row Broadcast**: Broadcast selected A submatrix to all processes in the same row
+3. **Local Multiplication**: Each process multiplies received A submatrix by its local B submatrix
+4. **Column Rotation**: Circularly shift B submatrices up within each column (top row sends to bottom row)
 
 ## Project Structure
 
@@ -31,7 +68,8 @@ The project is modularized into separate components for clarity and reusability:
 | `main.c`                | Main program, MPI setup, and algorithm orchestration. |
 | `fox.h` / `fox.c`       | Structures and functions for the Fox Algorithm.       |
 | `matrix.h` / `matrix.c` | Matrix allocation, I/O, and manipulation.             |
-| `io.h` / `io.c`         | Input/output handling and matrix reading/writing.     |
+| `io.h`                  | Input/output handling                                 |
+| `Makefile`              | Build system with compilation and automated tests     |
 
 ---
 
@@ -41,32 +79,71 @@ The project is modularized into separate components for clarity and reusability:
 
 #### `struct FoxDetails`
 
-Contains the configuration and metadata for the parallel grid:
+The central configuration structure that contains all grid and matrix parameters:
 
-- `Q`: number of processes per dimension (grid size $Q \times Q$)
-- `N`: global matrix size
-- `per_process_n`: local matrix block size
-- `myRow`, `myColumn`, `myRank`: process position in the grid
-- `envData`: environment information (MPI context)
+- **`Q`**: Square root of total processes (grid dimension) - creates a Q×Q process grid
+- **`N`**: Global matrix size (N×N input matrix)
+- **`per_process_n`**: Local submatrix size per process (N/Q)×(N/Q)
+- **`myRow`, `myColumn`**: Process coordinates in the 2D grid (0 to Q-1)
+- **`myRank`**: Process rank within the Cartesian communicator
+- **`envData`**: Contains MPI environment information (total processor count)
+
+**Validation Requirements**:
+- Total processes must be a perfect square (p = Q²)
+- Matrix size N must be divisible by Q
+- Each process handles exactly (N/Q)² matrix elements
 
 #### `struct FoxMPI`
 
-Defines the MPI communication context:
+Complete MPI communication infrastructure for the Fox algorithm:
 
-- `cart`: global 2D Cartesian communicator
-- `row`, `col`: subcommunicators for row and column communication
-- `datatype`: custom MPI datatype representing a matrix block
+- **`fox_details`**: Embedded FoxDetails structure with grid configuration
+- **`cart`**: 2D Cartesian communicator with wraparound topology for the entire Q×Q grid
+- **`row`**: Row-specific subcommunicator enabling broadcasts within process rows
+- **`col`**: Column-specific subcommunicator for vertical data circulation
+- **`datatype`**: Custom MPI datatype representing a contiguous (N/Q)×(N/Q) matrix block
+
+**Communication Topology**:
+- **Cartesian Grid**: Processes arranged in a Q×Q torus with periodic boundaries
+- **Row Communicators**: Enable simultaneous broadcasting of A-blocks across each row
+- **Column Communicators**: Support circular shifting of B-blocks vertically
 
 ---
 
-### 4.2 Process Grid
+### Process Grid Architecture
 
-Processes are arranged in a **2D Cartesian topology**
+#### 2D Cartesian Topology Setup
 
-Each process manages:
+The implementation creates a **Q×Q torus topology** with the following characteristics:
 
-- A **local submatrix** of A, B, and C of size $(N/Q) \times (N/Q)$
-- MPI communication with neighboring processes in its row and column.
+**Grid Organization**:
+- Process assignment: `f(p) = (p / Q, p mod Q)` maps linear rank to (row, col) coordinates
+- **Periodic boundaries**: Processes at edges wrap around (top connects to bottom, left to right)
+- **Coordinate system**: (0,0) at top-left, (Q-1,Q-1) at bottom-right
+
+**Local Data Management**:
+Each process (i,j) manages:
+- **Local A-block**: Submatrix A[i][j] of size (N/Q)×(N/Q)
+- **Local B-block**: Submatrix B[i][j] of size (N/Q)×(N/Q)  
+- **Local C-block**: Result submatrix C[i][j] for accumulating partial products
+- **Communication buffers**: Temporary storage for received A and B blocks
+
+**Memory Layout**:
+- Matrices stored as **contiguous 1D arrays** for efficient MPI communication
+- Custom MPI datatype represents entire (N/Q)×(N/Q) submatrix block
+- Matrix element indexing: `element[row][col] = array[row * (N/Q) + col]`
+
+#### Communication Patterns
+
+**Row-wise Broadcasting** (A-block distribution):
+- In step k, each row r broadcasts A-block from column `(r + k) mod Q`
+- Uses row subcommunicators for simultaneous broadcasts across all rows
+- Ensures all processes in a row receive the same A-block for multiplication
+
+**Column-wise Circulation** (B-block rotation):
+- B-blocks shift upward within each column after each multiplication
+- Circular topology: top process sends to bottom process
+- Maintains synchronized access to different B-blocks across iterations
 
 ---
 
@@ -91,6 +168,77 @@ Each process manages:
 - **Matrix I/O**: Reading adjacency matrices from input files
 - **Memory Management**: Allocation and deallocation of matrix structures
 - **Utility Functions**: Matrix copying, initialization, and validation
+
+### 4. MPI Communication Framework
+
+To enable parallel computation across multiple processes, the implementation leverages **MPI (Message Passing Interface)**, a standardized framework for process communication in distributed computing environments.
+
+MPI provides the foundation for scaling the Fox algorithm from single-machine execution to large-scale supercomputer deployments without requiring code modifications. The same program can seamlessly operate across multiple cores, nodes, or entire computing clusters.
+
+#### 4.1 Communicator Architecture
+
+MPI organizes processes into **communicators** - groups that define communication scope and topology. The implementation uses a hierarchical communicator structure:
+
+**Global Communicator (`MPI_COMM_WORLD`)**:
+- Contains all processes participating in the computation
+- Used for initial setup and final result gathering
+- Provides the foundation for creating specialized subcommunicators
+
+**Custom Communicators**:
+- **Row Communicators**: Enable efficient broadcasting within each process row
+- **Column Communicators**: Support vertical circulation of matrix blocks
+- **Cartesian Communicator**: 2D grid topology with wraparound boundaries
+
+This design optimizes communication efficiency by limiting message scope to relevant process subsets, rather than broadcasting to all processes globally.
+
+#### 4.2 Custom MPI Datatype
+
+The implementation defines a **custom MPI datatype** to represent matrix subblocks:
+
+```c
+MPI_Type_contiguous(perProcessMatrixSize * perProcessMatrixSize, 
+                   MATRIX_ELEMENT_MPI, &datatype);
+```
+
+**Benefits**:
+- **Atomic Operations**: Entire (N/Q)×(N/Q) submatrices transmitted as single units
+- **Type Safety**: Ensures consistent data interpretation across processes
+- **Performance**: Reduces communication overhead compared to element-by-element transfers
+
+#### 4.3 Communication Patterns
+
+**Matrix Distribution (`MPI_Scatter`)**:
+- Root process divides input matrix into subblocks
+- Each process receives its assigned (N/Q)×(N/Q) submatrix
+- Ensures load balancing across the process grid
+
+**Row-wise Broadcasting (`MPI_Bcast`)**:
+- A-blocks broadcast horizontally within each row
+- Uses row subcommunicators for simultaneous broadcasts
+- Critical for Fox algorithm's matrix multiplication phase
+
+**Column-wise Circulation (`MPI_Sendrecv_replace`)**:
+- B-blocks circulate vertically within each column
+- Simultaneous send to process below and receive from process above
+- Implements circular topology with wraparound (top to and from bottom)
+
+**Result Collection (`MPI_Gather`)**:
+- Each process contributes its computed C-submatrix
+- Root process assembles final result matrix
+- Preserves original matrix structure and ordering
+
+#### 4.4 MPI Functions Utilized
+
+The implementation employs the following MPI operations:
+
+- **`MPI_Cart_create`**: Establishes 2D Cartesian topology with periodic boundaries
+- **`MPI_Cart_sub`**: Creates row and column subcommunicators from Cartesian grid
+- **`MPI_Bcast`**: Broadcasts A-blocks within process rows
+- **`MPI_Sendrecv_replace`**: Implements circular B-block rotation in columns
+- **`MPI_Scatter`**: Distributes input matrix subblocks to processes
+- **`MPI_Gather`**: Collects result submatrices from all processes
+- **`MPI_Type_contiguous`**: Defines custom datatype for matrix subblocks
+- **`MPI_Comm_rank`** / **`MPI_Comm_size`**: Process identification and grid setup
 
 ## Supported Configurations
 
@@ -175,30 +323,6 @@ mpirun -np 16 ./main matrix_examples/input1200 # 4x4 grid, 300x300 per process
 4. **Performance Monitoring**: Track execution times across different configurations
 
 ## Performance Benchmarks
-
-### Cluster Testing Requirements
-
-_[This section will be populated after cluster execution]_
-
-**Testing Environment**:
-
-- Cluster specifications: TBD
-- Node configuration: TBD
-- Network topology: TBD
-
-**Benchmark Matrices**:
-
-- Small scale: 300x300, 600x600
-- Medium scale: 1200x1200
-- Large scale: TBD based on cluster capacity
-
-**Metrics to Collect**:
-
-- Execution time vs. process count
-- Speedup calculations
-- Efficiency measurements
-- Communication overhead analysis
-- Scalability curves
 
 **Expected Results**:
 
@@ -348,6 +472,11 @@ This explains why:
   - **Hybrid parallelism (MPI + OpenMP)**
 
 ---
+
+## Difficulties
+Along the making of this project we had a few complications: "Random" Segmentation Faults, after some debug we conclude the only place that could be causing this was the MPI_Finalize step, once we tried to understant why on StackOverflow we concluded that this is a recurring problem in the library, and the fixes suggested there didn't help.
+Oversubscribe flag was not supported through different machines. This problem was utterly ignored after running on the cluster and nothing happened. 
+Finally to replicate the way we treat our matrices we tried using MPI_Type_vector, for some reason we couldn't understand the program just wouldn't work, so we ended up replicating the same effect without using the provided method
 
 ## Conclusion
 
