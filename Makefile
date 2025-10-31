@@ -54,7 +54,6 @@ test-timed: $(TARGET)
 	@echo "=== Performance Benchmarking ==="
 	@echo "Running timing tests for all process configurations..."
 	@echo ""
-	@rm -f timing_results.txt
 	@$(MAKE) run-timed-tests
 	@echo ""
 	@echo "📊 Performance Results Summary:"
@@ -62,7 +61,6 @@ test-timed: $(TARGET)
 	@printf "%-12s %-10s %s\n" "Processes" "Matrix" "Time (seconds)"
 	@echo "------------------------------------"
 	@cat timing_results.txt
-	@rm -f timing_results.txt
 
 run-timed-tests: $(TARGET)
 	@$(MAKE) timed-p1 timed-p4 timed-p9 timed-p16 timed-p25
