@@ -61,7 +61,7 @@ test-timed: $(TARGET)
 	@echo "================================"
 	@printf "%-12s %-10s %s\n" "Processes" "Matrix" "Time (seconds)"
 	@echo "------------------------------------"
-	@cat timing_results.txt "
+	@cat timing_results.txt
 	@rm -f timing_results.txt
 
 run-timed-tests: $(TARGET)
