@@ -4,8 +4,6 @@ CC = mpicc
 # Compilation flags
 CFLAGS = -Wall -Wextra -O2 -Iinclude
 
-
-
 # Source and object files
 SRC = main.c fox.c matrix.c 
 OBJ = $(SRC:.c=.o)
@@ -154,7 +152,7 @@ test: $(TARGET)
 
 test-input5: $(TARGET)
 	@echo "Testing input5..."
-	@echo "⚠️ input5: SKIPPED (5x5 matrix not supported by Fox algorithm)"
+	@echo "input5: SKIPPED (5x5 matrix not supported by Fox algorithm)"
 
 test-input6: $(TARGET)
 	@echo "Testing input6..."

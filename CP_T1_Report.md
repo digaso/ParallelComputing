@@ -110,43 +110,6 @@ Complete MPI communication infrastructure for the Fox algorithm:
 
 ---
 
-### Process Grid Architecture
-
-#### 2D Cartesian Topology Setup
-
-The implementation creates a **Q×Q torus topology** with the following characteristics:
-
-**Grid Organization**:
-- Process assignment: `f(p) = (p / Q, p mod Q)` maps linear rank to (row, col) coordinates
-- **Periodic boundaries**: Processes at edges wrap around (top connects to bottom, left to right)
-- **Coordinate system**: (0,0) at top-left, (Q-1,Q-1) at bottom-right
-
-**Local Data Management**:
-Each process (i,j) manages:
-- **Local A-block**: Submatrix A[i][j] of size (N/Q)×(N/Q)
-- **Local B-block**: Submatrix B[i][j] of size (N/Q)×(N/Q)  
-- **Local C-block**: Result submatrix C[i][j] for accumulating partial products
-- **Communication buffers**: Temporary storage for received A and B blocks
-
-**Memory Layout**:
-- Matrices stored as **contiguous 1D arrays** for efficient MPI communication
-- Custom MPI datatype represents entire (N/Q)×(N/Q) submatrix block
-- Matrix element indexing: `element[row][col] = array[row * (N/Q) + col]`
-
-#### Communication Patterns
-
-**Row-wise Broadcasting** (A-block distribution):
-- In step k, each row r broadcasts A-block from column `(r + k) mod Q`
-- Uses row subcommunicators for simultaneous broadcasts across all rows
-- Ensures all processes in a row receive the same A-block for multiplication
-
-**Column-wise Circulation** (B-block rotation):
-- B-blocks shift upward within each column after each multiplication
-- Circular topology: top process sends to bottom process
-- Maintains synchronized access to different B-blocks across iterations
-
----
-
 ## Core Functions
 
 ### 1. Main MPI Setup (`main.c`)
@@ -184,50 +147,7 @@ MPI organizes processes into **communicators** - groups that define communicatio
 - Used for initial setup and final result gathering
 - Provides the foundation for creating specialized subcommunicators
 
-**Custom Communicators**:
-- **Row Communicators**: Enable efficient broadcasting within each process row
-- **Column Communicators**: Support vertical circulation of matrix blocks
-- **Cartesian Communicator**: 2D grid topology with wraparound boundaries
-
-This design optimizes communication efficiency by limiting message scope to relevant process subsets, rather than broadcasting to all processes globally.
-
-#### 4.2 Custom MPI Datatype
-
-The implementation defines a **custom MPI datatype** to represent matrix subblocks:
-
-```c
-MPI_Type_contiguous(perProcessMatrixSize * perProcessMatrixSize, 
-                   MATRIX_ELEMENT_MPI, &datatype);
-```
-
-**Benefits**:
-- **Atomic Operations**: Entire (N/Q)×(N/Q) submatrices transmitted as single units
-- **Type Safety**: Ensures consistent data interpretation across processes
-- **Performance**: Reduces communication overhead compared to element-by-element transfers
-
-#### 4.3 Communication Patterns
-
-**Matrix Distribution (`MPI_Scatter`)**:
-- Root process divides input matrix into subblocks
-- Each process receives its assigned (N/Q)×(N/Q) submatrix
-- Ensures load balancing across the process grid
-
-**Row-wise Broadcasting (`MPI_Bcast`)**:
-- A-blocks broadcast horizontally within each row
-- Uses row subcommunicators for simultaneous broadcasts
-- Critical for Fox algorithm's matrix multiplication phase
-
-**Column-wise Circulation (`MPI_Sendrecv_replace`)**:
-- B-blocks circulate vertically within each column
-- Simultaneous send to process below and receive from process above
-- Implements circular topology with wraparound (top to and from bottom)
-
-**Result Collection (`MPI_Gather`)**:
-- Each process contributes its computed C-submatrix
-- Root process assembles final result matrix
-- Preserves original matrix structure and ordering
-
-#### 4.4 MPI Functions Utilized
+#### 4.2 MPI Functions Utilized
 
 The implementation employs the following MPI operations:
 
@@ -241,19 +161,6 @@ The implementation employs the following MPI operations:
 - **`MPI_Comm_rank`** / **`MPI_Comm_size`**: Process identification and grid setup
 
 ## Supported Configurations
-
-### Process Counts and Matrix Compatibility
-
-The implementation supports various process counts with corresponding matrix size requirements:
-
-| Process Count (P) | Grid Layout | Compatible Matrix Sizes |
-| ----------------- | ----------- | ----------------------- |
-| 1                 | 1 x 1         | All sizes               |
-| 4                 | 2 x 2         | Multiples of 2          |
-| 9                 | 3 x 3         | Multiples of 3          |
-| 16                | 4 x 4         | Multiples of 4          |
-| 25                | 5 x 5         | Multiples of 5          |
-
 ### Test Matrix Configurations
 
 - **input5**: 5x5 matrix (compatible with P=1 only)
@@ -281,28 +188,6 @@ make test-p9           # Test 3x3 process grid
 make test-p16          # Test 4x4 process grid
 make test-p25          # Test 5x5 process grid
 ```
-
-### Compilation Flags
-
-```make
-CFLAGS = -std=c11 -O2 -Wall -Wextra
-MPICC = mpicc
-```
-
-## Architecture Decisions
-
-### Error Handling
-
-- **Input Validation**: Ensures matrix dimensions are compatible with process counts
-- **MPI Error Checking**: Validates MPI operation success
-- **Resource Cleanup**: Proper deallocation of matrices and MPI communicators
-
-### Scalability Considerations
-
-- **Submatrix Size**: Each process handles (n/q)x(n/q) elements
-- **Communication Overhead**: Minimized through efficient broadcasting and shifting patterns
-- **Load Balance**: Equal distribution of work across all processes
-
 ## Testing Infrastructure
 
 ### Comprehensive Test Suite
@@ -314,13 +199,6 @@ The project includes 22 different test cases covering all valid matrix-process c
 mpirun -np 9 ./main matrix_examples/input300  # 3x3 grid, 100x100 per process
 mpirun -np 16 ./main matrix_examples/input1200 # 4x4 grid, 300x300 per process
 ```
-
-### Validation Process
-
-1. **Correctness Verification**: Compare parallel results with sequential computation
-2. **Process Count Testing**: Validate all supported process configurations
-3. **Matrix Size Testing**: Test various matrix dimensions for compatibility
-4. **Performance Monitoring**: Track execution times across different configurations
 
 ## Performance Benchmarks
 
@@ -385,37 +263,6 @@ The goal of these measurements is to evaluate how well the algorithm scales with
 
 ---
 
-### Observed Trends
-
-1. **Clear parallel speedup for large matrices**
-
-   - As the matrix size increases, parallelization provides a **significant reduction in execution time**.
-   - For example, with `N=1200`, runtime drops from **15.39s (P=1)** to **~4.02s (P=9)** -- roughly a **3.8$\times$ speedup**.
-
-2. **Diminishing returns for small matrices**
-
-   - For small sizes (`N=6`, `N=300`), the execution time does not improve significantly with more processes, and in some cases even increases.
-   - This happens because **communication costs outweigh computation time**.  
-     For example:
-     - `N=300`: 0.430s (P=4) → 0.531s (P=16) → 0.591s (P=25)
-     - Here, more processes lead to **higher MPI overhead** with little computational gain.
-
-3. **Non-linear scalability**
-
-   - Between `P=9` and `P=16`, we see **non-monotonic behavior**:
-     - `N=600`: 0.818s (P=9) vs. 0.924s (P=16)
-     - `N=900`: 1.881s (P=9) vs. 2.037s (P=16)
-   - This is a typical sign of **communication bottlenecks** caused by:
-     - Increased number of broadcasts and shifts in Fox Algorithm
-     - Smaller local matrices (less work per process)
-     - Higher synchronization frequency
-
-4. **Optimal process count depends on matrix size**
-   - For smaller matrices ($\leq$ 600), optimal performance occurs around **P=4–9**.
-   - For larger matrices ($\geq$ 900), using up to **P=16 or P=25** remains beneficial, though with reduced efficiency.
-
----
-
 ### Speedup and Efficiency Discussion
 
 Let \( T_1 \) be the time with one process and \( T_P \) the time with P processes.  
@@ -476,7 +323,7 @@ This explains why:
 ## Difficulties
 Along the making of this project we had a few complications: "Random" Segmentation Faults, after some debug we conclude the only place that could be causing this was the MPI_Finalize step, once we tried to understant why on StackOverflow we concluded that this is a recurring problem in the library, and the fixes suggested there didn't help.
 Oversubscribe flag was not supported through different machines. This problem was utterly ignored after running on the cluster and nothing happened. 
-Finally to replicate the way we treat our matrices we tried using MPI_Type_vector, for some reason we couldn't understand the program just wouldn't work, so we ended up replicating the same effect without using the provided method
+Finally to replicate the way we treat our matrices we tried using MPI_Type_vector, for some reason we couldn't understand, the program just wouldn't work, so we ended up replicating the same effect without using the provided method
 
 ## Conclusion
 
