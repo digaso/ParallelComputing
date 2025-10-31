@@ -21,9 +21,34 @@
   </component>
   <component name="CMakeRunConfigurationManager">
     <generated>
-      <config projectName="ParalelComputing" targetName="UnityLib" />
-      <config projectName="ParalelComputing" targetName="unity" />
-      <config projectName="ParalelComputing" targetName="ParalelComputing" />
+      <config projectName="ParalelComputingV1.1" targetName="test" />
+      <config projectName="ParalelComputingV1.1" targetName="test-p25" />
+      <config projectName="ParalelComputingV1.1" targetName="run" />
+      <config projectName="ParalelComputingV1.1" targetName="test-input5" />
+      <config projectName="ParalelComputingV1.1" targetName="UnityLib" />
+      <config projectName="ParalelComputingV1.1" targetName="program" />
+      <config projectName="ParalelComputingV1.1" targetName="test-input600" />
+      <config projectName="ParalelComputingV1.1" targetName="test-p1" />
+      <config projectName="ParalelComputingV1.1" targetName="test-input1200" />
+      <config projectName="ParalelComputingV1.1" targetName="timed-p4" />
+      <config projectName="ParalelComputingV1.1" targetName="test-multi" />
+      <config projectName="ParalelComputingV1.1" targetName="timed-p16" />
+      <config projectName="ParalelComputingV1.1" targetName="test-timed" />
+      <config projectName="ParalelComputingV1.1" targetName="test-input900" />
+      <config projectName="ParalelComputingV1.1" targetName="clean-tests" />
+      <config projectName="ParalelComputingV1.1" targetName="test-p16" />
+      <config projectName="ParalelComputingV1.1" targetName="test-input6" />
+      <config projectName="ParalelComputingV1.1" targetName="test-input300" />
+      <config projectName="ParalelComputingV1.1" targetName="unity" />
+      <config projectName="ParalelComputingV1.1" targetName="test-p9" />
+      <config projectName="ParalelComputingV1.1" targetName="test-p4" />
+      <config projectName="ParalelComputingV1.1" targetName="timed-p9" />
+      <config projectName="ParalelComputingV1.1" targetName="run-timed-tests" />
+      <config projectName="ParalelComputingV1.1" targetName="all" />
+      <config projectName="ParalelComputingV1.1" targetName="ParalelComputing" />
+      <config projectName="ParalelComputingV1.1" targetName="timed-p1" />
+      <config projectName="ParalelComputingV1.1" targetName="test-single" />
+      <config projectName="ParalelComputingV1.1" targetName="timed-p25" />
     </generated>
   </component>
   <component name="CMakeSettings">
@@ -32,7 +57,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7d82751b-df8d-4f89-bd8b-1c4449f949b2" name="Changes" comment="" />
+    <list default="true" id="7d82751b-df8d-4f89-bd8b-1c4449f949b2" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fox.c" beforeDir="false" afterPath="$PROJECT_DIR$/fox.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fox.h" beforeDir="false" afterPath="$PROJECT_DIR$/fox.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/main.c" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -42,21 +72,71 @@
     <option name="formatViaClangd" value="false" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
-  <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/cmake-build-debug/_deps/unity-src" />
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "nuno1212s"
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;nuno1212s&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/ThrowTheSwitch/Unity.git",
-    "accountId": "db6ab1e3-0bc4-4269-93c9-07244f99a26a"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ThrowTheSwitch/Unity.git&quot;,
+    &quot;accountId&quot;: &quot;db6ab1e3-0bc4-4269-93c9-07244f99a26a&quot;
   }
-}]]></component>
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/fox.c" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/fox.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/io.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/main.c" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/matrix.c" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/matrix.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file:///usr/include/stdlib.h" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="RILoLRLm" />
+  </component>
+  <component name="MakefileLocalSettings">
+    <option name="availableProjects">
+      <map>
+        <entry>
+          <key>
+            <ExternalProjectPojo>
+              <option name="name" value="ParalelComputingV1.1" />
+              <option name="path" value="$PROJECT_DIR$" />
+            </ExternalProjectPojo>
+          </key>
+          <value>
+            <list>
+              <ExternalProjectPojo>
+                <option name="name" value="ParalelComputingV1.1" />
+                <option name="path" value="$PROJECT_DIR$" />
+              </ExternalProjectPojo>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="projectSyncType">
+      <map>
+        <entry key="$PROJECT_DIR$" value="RE_IMPORT" />
+      </map>
+    </option>
+  </component>
   <component name="ProjectApplicationVersion">
     <option name="ide" value="CLion" />
     <option name="majorVersion" value="2025" />
@@ -83,7 +163,7 @@
     "RunOnceActivity.west.config.association.type.startup.service": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "v2.5.2",
+    "git-widget-placeholder": "main",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.stylelint": "true",
     "node.js.detected.package.tslint": "true",
@@ -95,10 +175,135 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="CMake Application.ParalelComputing">
+  <component name="RunManager" selected="C/C++ File.main.c">
     <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="all" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="all" CONFIG_NAME="all" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="clean-tests" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="clean-tests" CONFIG_NAME="clean-tests" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="program" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="program" CONFIG_NAME="program" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="run-timed-tests" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="run-timed-tests" CONFIG_NAME="run-timed-tests" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="run" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="run" CONFIG_NAME="run" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test-input1200" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="test-input1200" CONFIG_NAME="test-input1200" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test-input300" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="test-input300" CONFIG_NAME="test-input300" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test-input5" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="test-input5" CONFIG_NAME="test-input5" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test-input6" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="test-input6" CONFIG_NAME="test-input6" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test-input600" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="test-input600" CONFIG_NAME="test-input600" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test-input900" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="test-input900" CONFIG_NAME="test-input900" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test-multi" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="test-multi" CONFIG_NAME="test-multi" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test-p1" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="test-p1" CONFIG_NAME="test-p1" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test-p16" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="test-p16" CONFIG_NAME="test-p16" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test-p25" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="test-p25" CONFIG_NAME="test-p25" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test-p4" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="test-p4" CONFIG_NAME="test-p4" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test-p9" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="test-p9" CONFIG_NAME="test-p9" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test-single" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="test-single" CONFIG_NAME="test-single" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test-timed" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="test-timed" CONFIG_NAME="test-timed" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="test" CONFIG_NAME="test" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="timed-p1" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="timed-p1" CONFIG_NAME="timed-p1" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="timed-p16" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="timed-p16" CONFIG_NAME="timed-p16" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="timed-p25" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="timed-p25" CONFIG_NAME="timed-p25" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="timed-p4" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="timed-p4" CONFIG_NAME="timed-p4" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="timed-p9" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="timed-p9" CONFIG_NAME="timed-p9" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
       </method>
     </configuration>
     <configuration name="ParalelComputing" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputing" TARGET_NAME="ParalelComputing" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ParalelComputing" RUN_TARGET_NAME="ParalelComputing">
@@ -116,10 +321,42 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration name="main.c" type="CppFileRunConfiguration" factoryName="CppFileRunConfiguration" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ParalelComputingV1.1" TARGET_NAME="main.c" CONFIG_NAME="main.c">
+      <option name="sourceFile" value="main.c" />
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.runfile.CppFileBuildBeforeRunTaskProvider$BasicBuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <list>
+      <item itemvalue="C/C++ File.main.c" />
       <item itemvalue="CMake Application.ParalelComputing" />
       <item itemvalue="CMake Application.UnityLib" />
       <item itemvalue="CMake Application.unity" />
+      <item itemvalue="Native Application.all" />
+      <item itemvalue="Native Application.clean-tests" />
+      <item itemvalue="Native Application.program" />
+      <item itemvalue="Native Application.run" />
+      <item itemvalue="Native Application.run-timed-tests" />
+      <item itemvalue="Native Application.test" />
+      <item itemvalue="Native Application.test-input5" />
+      <item itemvalue="Native Application.test-input6" />
+      <item itemvalue="Native Application.test-input300" />
+      <item itemvalue="Native Application.test-input600" />
+      <item itemvalue="Native Application.test-input900" />
+      <item itemvalue="Native Application.test-input1200" />
+      <item itemvalue="Native Application.test-multi" />
+      <item itemvalue="Native Application.test-p1" />
+      <item itemvalue="Native Application.test-p4" />
+      <item itemvalue="Native Application.test-p9" />
+      <item itemvalue="Native Application.test-p16" />
+      <item itemvalue="Native Application.test-p25" />
+      <item itemvalue="Native Application.test-single" />
+      <item itemvalue="Native Application.test-timed" />
+      <item itemvalue="Native Application.timed-p1" />
+      <item itemvalue="Native Application.timed-p4" />
+      <item itemvalue="Native Application.timed-p9" />
+      <item itemvalue="Native Application.timed-p16" />
+      <item itemvalue="Native Application.timed-p25" />
     </list>
   </component>
   <component name="TaskManager">

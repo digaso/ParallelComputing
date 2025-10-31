@@ -24,6 +24,8 @@ struct FoxDetails* initFoxDetails(int Q, int N, struct EnvData env_data);
 
 struct FoxMPI* initFoxMPI(struct FoxDetails fox_details);
 
+void free_fox_mpi(struct FoxMPI* fox_mpi);
+
 int setup_grid(struct FoxMPI* fox_mpi);
 
 inline int calculateStartRow(const int processID, const struct FoxDetails* foxDetails) {

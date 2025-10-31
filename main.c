@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
     allocate_matrix(per_process_size, &localB);
     allocate_matrix(per_process_size, &localC);
 
-    // Scatter (like Trabalho_1)
+    // Scatter
     MPI_Scatter(dividedMatrix, 1, fox_mpi->datatype, localA, 1, fox_mpi->datatype, ROOT, fox_mpi->cart);
 
     // Copy A to B initially
@@ -112,7 +112,7 @@ int main(int argc, char** argv) {
     // Execute Fox algorithm for all-pairs shortest path
     performAllPairsShortestPath(fox_mpi, localA, localB, localC);
 
-    // Gather results (like Trabalho_1)
+    // Gather results
     MPI_Gather(localC, 1, fox_mpi->datatype, dividedMatrix, 1, fox_mpi->datatype, ROOT, fox_mpi->cart);
 
     if (fox_mpi->fox_details.myRank == ROOT) {
@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
     free_matrix(&localB);
     free_matrix(&localC);
     free(fox_details);
-    free(fox_mpi);
+    free_fox_mpi(fox_mpi);
     end_time = MPI_Wtime();
     elapsed_time = end_time - start_time;
     if (rank == 0) {

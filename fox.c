@@ -32,6 +32,16 @@ struct FoxMPI* initFoxMPI(struct FoxDetails fox_details) {
     return fox_mpi;
 }
 
+void free_fox_mpi(struct FoxMPI *fox_mpi) {
+    MPI_Type_free(&fox_mpi->datatype);
+
+    MPI_Comm_free(&fox_mpi->row);
+    MPI_Comm_free(&fox_mpi->col);
+    MPI_Comm_free(&fox_mpi->cart);
+
+    free(fox_mpi);
+}
+
 int setup_mpi_datatype(MPI_Datatype* datatype, const struct FoxDetails* fox_details) {
     //The size of the matrix per process
     const int perProcessMatrixSize = fox_details->N / fox_details->Q;
