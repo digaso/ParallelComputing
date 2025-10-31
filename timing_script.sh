@@ -32,7 +32,7 @@ done
 
 # P=16 tests
 echo "🔹 Running P=16 tests..." >&2
-for input in input300 input600 input1200; do
+for input in input300 input600 input900 input1200; do
     echo "Testing P=16 $input..." >&2
     time_result=$(TIMEFORMAT='%3R'; time (cat matrix_examples/$input | mpirun --oversubscribe -np 16 ./program >/dev/null 2>&1) 2>&1)
     printf "%-12s %-10s %s\n" "P=16" "$input" "${time_result}s"
